@@ -1,0 +1,6 @@
+express
+    POST add/update item
+        Adds reduction
+    GET item
+    GET all items
+    POST get all items and update
