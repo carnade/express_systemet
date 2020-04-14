@@ -33,7 +33,7 @@ const itemSchema = new Schema({
     country: String,
     origin1: String,
     origin2: String,
-    Producer: String,
+    producer: String,
     sellStart: String,
     scoreVivino: String,
     urlVivino: String,
@@ -45,7 +45,7 @@ const itemSchema = new Schema({
     assortment: String,
     assortmentText: String
 },{
-    collection: 'wines',
+    collection: 'winelist',
     timestamps: true
 });
 
