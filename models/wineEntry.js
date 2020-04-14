@@ -45,7 +45,7 @@ const itemSchema = new Schema({
     assortment: String,
     assortmentText: String
 },{
-    collection: 'winelist',
+    collection: process.env.COLLECTION,
     timestamps: true
 });
 

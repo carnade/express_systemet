@@ -27,8 +27,8 @@ app.use(bodyParser.json());
 // hook morganBody to express app
 morganBody(app, { stream: accessLogStream });
 
-const betsRoute = require('./routes/item.js');
-app.use('/item/', betsRoute);
+const itemRoute = require('./routes/item.js');
+app.use('/item/', itemRoute);
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
