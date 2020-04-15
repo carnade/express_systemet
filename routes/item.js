@@ -22,53 +22,11 @@ router.get('/:id', (req, res) => {
     res.send('Hi there ' + req.params.id + '!')
 });
 
-router.post('/update/vivino/', async (req, res) => {
+router.post('/update/vivino/', (req, res) => {
 
-    let updated = 0;
-
-    await wineEntry.find({ scoreVivino: null }, async function(err, result) {
-        if (err) {
-            res.send(err);
-        } else {
-            result.forEach(async dbEntry => {
-                let extra = dbEntry.nameExtra===null?'':'+'+dbEntry.nameExtra;
-                let wine = encodeURI(dbEntry.name + extra);
-                console.log(wine);
-                await axios.get('https://www.vivino.com/search/wines?q=' + wine)
-                    .then( async function (response) {
-                        // handle success'
-                        let $ = cheerio.load(response.data);
-                        let href = $('.wine-card__name').children().first().attr('href');
-                        let rating = remove_linebreaks($(".average__number").first().text());
-                        console.log(href + ' - ' + rating);
-                        updated++;
-                        if (href) {
-                            dbEntry.urlVivino='https://www.vivino.com' + href;
-                        } else {
-                            dbEntry.urlVivino='-';
-                        };
-                        if (rating){
-                            dbEntry.scoreVivino=rating;
-                        }else {
-                            dbEntry.scoreVivino='-';
-                        }
-                        await dbEntry.save()
-                    })
-                    .catch(function (error) {
-                        // handle error
-                        res.status(400).json({message:error})
-                        console.log(error);
-                    })
-                    .finally(function () {
-                        
-                    }); 
-                    await sleep(4);
-            }); 
-            await res.status(200).json({message: 'Updated: ' + updated + ' Vivino ratings!'});    
-        }      
-        
-    })
-    .limit(20);   
+    findAndUpdateVivino(async function(stats) {
+        await res.status(200).json(stats); 
+    } ); 
 });
 
 router.post('/update/list', async (req, res) => {
@@ -98,13 +56,58 @@ router.post('/update/list', async (req, res) => {
 router.post('/item/update/:id', (req, res) => {
 });
 
+
+async function findAndUpdateVivino(callback) {
+    let updated = 0;
+    wineEntry.find({ scoreVivino: null }, async function(err, result) {
+        if (err) {
+            res.send(err);
+        } else {
+            result.forEach(async dbEntry => {
+                let extra = dbEntry.nameExtra===null?'':'+'+dbEntry.nameExtra;
+                let wine = encodeURI(dbEntry.name + extra);
+                console.log(wine);
+                await axios.get('https://www.vivino.com/search/wines?q=' + wine)
+                    .then( async function (response) {
+                        // handle success'
+                        let $ = cheerio.load(response.data);
+                        let href = $('.wine-card__name').children().first().attr('href');
+                        let rating = remove_linebreaks($(".average__number").first().text());
+                        console.log(href + ' - ' + rating);
+                        
+                        if (href) {
+                            dbEntry.urlVivino='https://www.vivino.com' + href;
+                        } else {
+                            dbEntry.urlVivino='-';
+                        };
+                        if (rating){
+                            dbEntry.scoreVivino=rating;
+                        }else {
+                            dbEntry.scoreVivino='-';
+                        }
+                        console.log('before ' + updated);
+                        updated++;
+                        await dbEntry.save()
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        res.status(400).json({message:error})
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        
+                    }); 
+            });     
+        }        
+    }).limit(4); 
+    await callback({
+        'updated': updated
+    });   
+}
+
 function remove_linebreaks(str) { 
 	return str.replace( /[\r\n]+/gm, "" ); 
 };
 
-function sleep(seconds){
-    var waitUntil = new Date().getTime() + seconds*1000;
-    while(new Date().getTime() < waitUntil) true;
-}
 
 module.exports = router;
