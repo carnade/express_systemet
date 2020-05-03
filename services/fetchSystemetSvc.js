@@ -14,7 +14,7 @@ module.exports.checkAndUpdate = async function checkAndUpdate(data, callback) {
 
         if(dbEntry) {
             if (!outOfStock) {
-  
+
                 let lastPriceItem = dbEntry.priceHistory[dbEntry.priceHistory.length-1];
 
                 if (lastPriceItem && (sourceEntry.Price != lastPriceItem.price)) {
@@ -32,8 +32,9 @@ module.exports.checkAndUpdate = async function checkAndUpdate(data, callback) {
                     await dbEntry.save();              
                 };                
             } else {
+                dbEntry.outOfStock = outOfStock;
                 deleted++;
-                await dbEntry.delete();                
+                await dbEntry.save();                
             }  
         } else if (!outOfStock){
             const newEntry = createNewEntry(sourceEntry);
@@ -44,7 +45,7 @@ module.exports.checkAndUpdate = async function checkAndUpdate(data, callback) {
     callback({
         'inserted': inserted,
         'updated': updated,
-        'deleted': deleted
+        'outOfStock': deleted
     });
 }
 

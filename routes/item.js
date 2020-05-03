@@ -29,6 +29,15 @@ router.post('/update/vivino/', (req, res) => {
     } ); 
 });
 
+router.post('/update/vivino/grapes', (req, res) => {
+
+    fetchVivinoSvc.updateGrapesVivino(parseInt(process.env.VIVINO_FETCH_AMOUNT), async function(status, stats) {
+        await res.status(status).json(stats); 
+    } ); 
+});
+
+
+
 router.post('/update/list', async (req, res) => {
 
     //axios

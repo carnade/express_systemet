@@ -16,7 +16,8 @@ const itemSchema = new Schema({
     grapes:[
         {
             name: String,
-            percent: Number
+            percent: Number,
+            source: String
         }
     ],
     isOrganic: Boolean,

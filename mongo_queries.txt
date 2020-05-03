@@ -1,0 +1,21 @@
+#Find grape
+{ 'grapes.name': "Okänd"}
+
+#Find non rated
+{ scoreVivino: /^(?![0-9])/}
+
+db.winelist.aggregate([
+    { "$group": {
+        "_id": { "$toLower": "$country},
+        "count": { "$sum": 1 }
+    } },
+    { "$group": {
+        "_id": null,
+        "counts": {
+            "$push": { "k": "$_id", "v": "$count" }
+        }
+    } },
+    { "$replaceRoot": {
+        "newRoot": { "$arrayToObject": "$counts" }
+    } }    
+])
