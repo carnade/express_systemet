@@ -5,16 +5,16 @@ const wineEntry = require('../models/wineEntry');
 const fetchSystemetSvc = require('../services/fetchSystemetSvc');
 const fetchVivinoSvc = require('../services/fetchVivinoSvc');
 
-router.get('/all', async (req, res, next) => {
+router.get('/wines', async (req, res, next) => {
     try {
         const items = await wineEntry.find();
-        res.json(items);
+        res.status(200).json(items);
     } catch(error) {
         next(error);
     }
 });
 
-router.get('/reductions', (req, res) => {
+router.get('/wines/reductions', (req, res) => {
     res.send('Hi there ' + req.params.id + '!')
 });
 

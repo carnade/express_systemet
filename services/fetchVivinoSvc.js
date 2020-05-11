@@ -58,16 +58,13 @@ module.exports.findAndUpdateVivino = async function findAndUpdateVivino(amount, 
                         }
                         //console.log('before ' + updated);
                         updated++;
-                        await dbEntry.save()
+                        await dbEntry.save();
                     })
-                    .catch(function (error) {
+                    .catch(async function (error) {
                         // handle error
-                        callback(
-                            400, {
-                                'message': error
-                            }
-                        );
-                        console.log(error);
+                        dbEntry.urlVivino = '-';
+                        dbEntry.scoreVivino = '-';
+                        await dbEntry.save();
                     })
                     .finally(function () {
 
@@ -97,50 +94,52 @@ module.exports.updateGrapesVivino = async function updateGrapesVivino(amount, ca
             );
         } else {
             await asyncForEach(result, async dbEntry => {
-                await axios.get(dbEntry.urlVivino)
-                    .then(async function (response) {
-                        //console.log('before ' + updated);
-                        var matches = [];
-                        //console.log(response.data)
-                        response.data.replace(regex, function(match, arr) {
-                            matches.push({
-                                data: arr
-                            });
-                        });
-                        grapes = JSON.parse(matches[0].data);
-                        if (grapes.length == 0) {
-                            console.log('Okänd');
-                            dbEntry.grapes.push({                              
-                                name: 'Okänd',
-                                source: 'Vivino'
-                            });
-                        }
-                        updated++;
-                        await asyncForEach(grapes, async grape => {                            
-                            await asyncForEach(grape.name.split('/'), name => {
-                                console.log(dbEntry.name + ': ' + name);
-                                dbEntry.grapes.push({
-                                    name: name,
-                                    source: 'Vivino'
+                if(dbEntry.urlVivino != '-') {
+                    await axios.get(dbEntry.urlVivino)
+                        .then(async function (response) {
+                            //console.log('before ' + updated);
+                            var matches = [];
+                            //console.log(response.data)
+                            response.data.replace(regex, function(match, arr) {
+                                matches.push({
+                                    data: arr
                                 });
                             });
-                        });
-
-                        //}
-                        await dbEntry.save()
-                    })
-                    .catch(function (error) {
-                        // handle error
-                        callback(
-                            400, {
-                                'message': error
+                            grapes = JSON.parse(matches[0].data);
+                            if (grapes.length == 0) {
+                                console.log('Okänd');
+                                dbEntry.grapes.push({                              
+                                    name: 'Okänd',
+                                    source: 'Vivino'
+                                });
                             }
-                        );
-                        console.log(error);
-                    })
-                    .finally(function () {
+                            updated++;
+                            await asyncForEach(grapes, async grape => {                            
+                                await asyncForEach(grape.name.split('/'), name => {
+                                    console.log(dbEntry.name + ': ' + name);
+                                    dbEntry.grapes.push({
+                                        name: name,
+                                        source: 'Vivino'
+                                    });
+                                });
+                            });
 
-                    });
+                            //}
+                            await dbEntry.save()
+                        })
+                        .catch(function (error) {
+                            // handle error
+                            callback(
+                                400, {
+                                    'message': error
+                                }
+                            );
+                            console.log(error);
+                        })
+                        .finally(function () {
+
+                        });
+                }
                 await sleep(parseInt(process.env.SLEEP_TIME_MS));
 
             });
