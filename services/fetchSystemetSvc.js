@@ -26,6 +26,7 @@ module.exports.checkAndUpdate = async function checkAndUpdate(data, callback) {
           dbEntry.lastestPriceChange = priceChange;
           dbEntry.lastestPriceChangePercent = priceChange / lastPriceItem.price;
           dbEntry.lastestPriceChangeDate = Date.now();
+          dbEntry.price = sourceEntry.Price;
 
           updated++;
           await dbEntry.save();
