@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const {
+    Schema
+} = mongoose;
 
 const itemSchema = new Schema({
     _id: String,
@@ -13,24 +15,21 @@ const itemSchema = new Schema({
     volume: Number,
     alcoholPercentage: Number,
     vintage: Number,
-    grapes:[
-        {
-            name: String,
-            percent: Number,
-            source: String
-        }
-    ],
+    grapes: [{
+        name: String,
+        percent: Number,
+        source: String
+    }],
     isOrganic: Boolean,
+    isEthical: Boolean,
     lastestPriceChange: Number,
     lastestPriceChangePercent: Number,
     lastestPriceChangeDate: Date,
-    priceHistory: [
-        {
-            price: Number,
-            priceChange: Number,
-            date: Date
-        }
-    ],
+    priceHistory: [{
+        price: Number,
+        priceChange: Number,
+        date: Date
+    }],
     country: String,
     origin1: String,
     origin2: String,
@@ -44,8 +43,19 @@ const itemSchema = new Schema({
     outOfStock: Boolean,
     tempOutOfStock: Boolean,
     assortment: String,
-    assortmentText: String
-},{
+    assortmentText: String,
+    tasteClockFruitacid: Number,
+    tasteClockBody: Number,
+    tasteClockRoughness: Number,
+    sugarContent: Number,
+    imageUrl: String,
+    isDiscontinued: Boolean,
+    isSupplierTemporaryNotAvailable: Boolean,
+    isRegionalRestricted: Boolean,
+    isNews: Boolean,
+    isWebLaunch: Boolean
+
+}, {
     collection: process.env.COLLECTION,
     timestamps: true
 });

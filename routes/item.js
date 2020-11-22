@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require("axios");
 const wineEntry = require('../models/wineEntry');
 const fetchSystemetSvc = require('../services/fetchSystemetSvc');
+const fetchSystemetScrapeSvc = require('../services/fetchSystemetScrapeSvc');
 const fetchVivinoSvc = require('../services/fetchVivinoSvc');
 
 router.get('/wines', async (req, res, next) => {
@@ -69,14 +70,19 @@ router.post('/update/list', async (req, res) => {
 router.get('/test/list', async (req, res) => {
 
     //axios
-    axios.get('https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch/search?size=30&page=7&categoryLevel1=Vin&categoryLevel2=R%C3%B6tt%20vin&isEcoFriendlyPackage=false&isInDepotStockForFastDelivery=false', {
+    //    axios.get('https://api-extern.systembolaget.se/sb-api-ecommerce/v1/productsearch/search?size=30&page=7&categoryLevel1=Vin&categoryLevel2=R%C3%B6tt%20vin&isEcoFriendlyPackage=false&isInDepotStockForFastDelivery=false', {
+    axios.get('http://localhost:3000/data', {
             headers: {
                 'Ocp-Apim-Subscription-Key': '874f1ddde97d43f79d8a1b161a77ad31'
             }
         })
         .then(async function (response) {
             // handle success'
-            console.log(response);
+            await fetchSystemetScrapeSvc.checkAndUpdate(response.data, function (stats) {
+                console.log("await response");
+                res.status(201).json(stats);
+            });
+
         })
         .catch(function (error) {
             // handle error
